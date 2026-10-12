@@ -1,0 +1,8 @@
+name: opencode-go-provider
+kind: model-provider
+version: 1.0.0
+description: OpenCode Go subscription — Sign in with OpenCode (device flow, OAuth auto-refresh, plan usage in /usage)
+author: m4
+license: MIT
+homepage: https://github.com/anomalyco/opencode
+tags: [model-provider, opencode, subscription]
