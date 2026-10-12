@@ -436,16 +436,12 @@ opencode_go = OpenCodeGoSigninProfile(
     # messages are fine, so vision keeps working via the text-summary downgrade.
     supports_vision_tool_messages=False,
     hidden=_registered_hidden(),
-    fallback_models=(
-        "glm-5.3-flash",
-        "glm-5.3",
-        "kimi-k2.6",
-        "kimi-k3",
-        "minimax-m3",
-        "deepseek-v4-pro",
-        "qwen3.8-max",
-        "claude-haiku-5-5",
-    ),
+    # No fallback_models tuple: an oauth_external profile's fallback rows would be served
+    # verbatim as the picker catalog (hermes_cli/models.py _profile_live_catalog returns
+    # ``list(fallback_models)`` for non-api-key auth), pinning a subset forever. Ours is a
+    # _MODELS_DEV_PREFERRED provider: the generic path serves the models.dev-merged static
+    # catalog (~44 models) instead, which Hermes keeps current upstream.
+    fallback_models=(),
 )
 
 register_provider(opencode_go)
