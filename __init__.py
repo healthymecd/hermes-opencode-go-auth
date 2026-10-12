@@ -357,16 +357,24 @@ class OpenCodeGoSigninProfile(ProviderProfile):
             return re_.thinking_toggle_extras(reasoning_config, re_.DEEPSEEK_V4_EFFORTS, re_.DEEPSEEK_V4_OVERRIDES)
         return {}, {}
 
-    def fetch_models(self, *, api_key: str | None = None, base_url: str | None = None, timeout: float = 8.0):
-        """The Zen catalog is public and works no matter which credential mode is active."""
-        try:
-            response = httpx.get(CATALOG_URL, timeout=timeout)
-            response.raise_for_status()
-            data = response.json()
-            models = [m["id"] for m in data.get("data", []) if m.get("id")]
-            return sorted(models) if models else None
-        except (httpx.HTTPError, ValueError, KeyError, TypeError) as exc:
-            logger.debug("OpenCode Go catalog fetch failed: %s", exc)
+    def fetch_models(self, *, api_key: str | None = None, base_url: str | None = None,
+                     timeout: float = 10.0):
+        """The Zen catalog is public and works no matter which credential mode is active.
+
+        Two quick attempts: the first request after process start can lose to a
+        DNS/TLS warm-up blip, which would otherwise shrink the picker to the
+        bundled fallback list."""
+        for attempt in range(2):
+            try:
+                response = httpx.get(CATALOG_URL, timeout=timeout)
+                response.raise_for_status()
+                data = response.json()
+                models = [m["id"] for m in data.get("data", []) if m.get("id")]
+                return sorted(models) if models else None
+            except (httpx.HTTPError, ValueError, KeyError, TypeError) as exc:
+                logger.debug("OpenCode Go catalog fetch attempt %d failed: %s", attempt + 1, exc)
+                if attempt == 0:
+                    time.sleep(0.5)
         return None
 
     def fetch_account_usage(self, *, base_url: str | None = None, api_key: str | None = None):
