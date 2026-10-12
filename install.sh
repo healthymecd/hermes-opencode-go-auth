@@ -5,12 +5,12 @@
 #   HERMES_HOME=/path ./install.sh
 set -e
 
-SRC_DIR="$(cd "$(dirname "$0")" && pwd)/opencode-go"
+SRC_DIR="$(cd "$(dirname "$0")" && pwd)"
 HERMES_HOME="${HERMES_HOME:-$HOME/.hermes}"
 DEST="$HERMES_HOME/plugins/model-providers/opencode-go"
 
-if [ ! -f "$SRC_DIR/__init__.py" ]; then
-    echo "error: cannot find the plugin directory next to install.sh" >&2
+if [ ! -f "$SRC_DIR/__init__.py" ] || [ ! -f "$SRC_DIR/plugin.yaml" ]; then
+    echo "error: cannot find the plugin at the repo root next to install.sh" >&2
     exit 1
 fi
 
@@ -23,7 +23,9 @@ if [ -d "$DEST" ]; then
     echo "  (previous version moved to $BACKUP)"
 fi
 
-cp -R "$SRC_DIR" "$DEST"
+mkdir -p "$DEST"
+cp "$SRC_DIR/__init__.py" "$SRC_DIR/plugin.yaml" "$DEST"
+[ -f "$SRC_DIR/PLUGIN_NOTES.md" ] && cp "$SRC_DIR/PLUGIN_NOTES.md" "$DEST/" || true
 
 echo
 echo "✓ Installed opencode-go into $DEST"
