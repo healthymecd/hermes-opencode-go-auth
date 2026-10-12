@@ -83,6 +83,8 @@ def _is_glm_5_2_model(model: str | None) -> bool:
 
 def _server_base(server: str | None) -> str:
     """Normalize the console base URL; https-only, no trailing slash."""
+    from hermes_cli.auth_constants import AuthError
+
     raw = (server or DEFAULT_SERVER).strip().rstrip("/")
     if not raw.startswith(("https://", "http://localhost", "http://127.0.0.1")):
         raise AuthError(
@@ -118,6 +120,8 @@ def _device_token(client: httpx.Client, server: str, payload: dict[str, Any]) ->
 
 def _poll_for_tokens(client: httpx.Client, server: str, device_code: str, interval: float, deadline: float) -> dict[str, Any]:
     """Poll the device grant, handling authorization_pending / slow_down."""
+    from hermes_cli.auth_constants import AuthError
+
     interval = max(interval, 1.0)
     slow_down = 0.0
     while time.time() < deadline:
