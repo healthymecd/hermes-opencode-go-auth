@@ -34,28 +34,36 @@ the profile this plugin re-registers.
 ## Package contents
 
 ```
-hermes-opencode-go/
+hermes-opencode-go-auth/
+├── __init__.py          the plugin — profile + device auth + refresh hooks
+├── plugin.yaml          model-provider manifest (kind: model-provider)
+├── PLUGIN_NOTES.md      plugin internals / architecture notes
+├── install.sh           manual installer (copies the plugin into your Hermes home)
 ├── README.md            ← you are here
-├── LICENSE              MIT
-├── install.sh           one-shot installer (copies the plugin into your Hermes home)
-├── hermes-opencode-go.zip   (same package, zipped for sharing)
-└── opencode-go/         the actual plugin
-    ├── __init__.py      profile + device auth + refresh hooks
-    ├── plugin.yaml      model-provider manifest (kind: model-provider)
-    └── README.md        plugin internals / architecture notes
+└── LICENSE              MIT
 ```
 
 ## Install
 
-### Option A — installer script
+### Option A — install with Hermes itself
 
 ```sh
-unzip hermes-opencode-go.zip   # if you got the zip
-cd hermes-opencode-go
+hermes plugins install healthymecd/hermes-opencode-go-auth
+```
+
+The plugin sits at the repo ROOT — exactly what `hermes plugins install` needs
+for a `kind: model-provider` package — so the command above is all it takes
+(discovery loads it; no `hermes plugins enable` step needed).
+
+### Option B — installer script
+
+```sh
+git clone git@github.com:healthymecd/hermes-opencode-go-auth.git
+cd hermes-opencode-go-auth
 ./install.sh
 ```
 
-### Option B — manual drop-in
+### Option C — manual drop-in
 
 Model-provider plugins load from `$HERMES_HOME/plugins/model-providers/<name>/`
 (default `HERMES_HOME` is `~/.hermes`):
@@ -66,9 +74,9 @@ cp -R opencode-go ~/.hermes/plugins/model-providers/
 ```
 
 (Hermes runs as an unusual account or in a container? Use the real home instead:
-`cp -R opencode-go "$HERMES_HOME/plugins/model-providers/"`.)
+`cp -R __init__.py plugin.yaml "$HERMES_HOME/plugins/model-providers/opencode-go/"`.)
 
-### Option C — git checkout
+### Option D — git checkout
 
 If you cloned a repo containing this directory into
 `~/.hermes/plugins/<name>` (the flat location `hermes plugins install` clones into),
